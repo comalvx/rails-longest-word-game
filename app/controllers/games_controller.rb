@@ -9,6 +9,20 @@ class GamesController < ApplicationController
   end
 
   def score
+
+    if in_grid? && valid_word?
+      @answer = "Well done!"
+      session[:score] += params[:attempt].length
+    elsif in_grid?
+      @answer = "This is not a valid word"
+    else
+      @answer = "This can't be built based on the given words"
+    end
+  end
+
+  private
+
+  def in_grid?
     @letters = params[:grid].split(" ")
     reference = Hash.new{0}
     @attempt = params[:attempt]
@@ -21,22 +35,19 @@ class GamesController < ApplicationController
       reference[letter] -= 1
     end
 
+    reference.each_value do |value|
+      return true if value >= 0
+    end
+  end
+
+  def valid_word?
     url = "https://wagon-dictionary.herokuapp.com/#{@attempt}"
     word = JSON.parse(open(url).read)
-
-    reference.each_value do |value|
-      if value < 0
-        @answer = "This can't be built from the given grid"
-      elsif value >= 0 && word["found"]
-        @answer = "Well done!"
-        session[:score] += 1
-      else
-        @answer = "This is not an existing word"
-      end
+    if word["found"]
+      return true
+    else
+      return false
     end
-
-
-
   end
 end
 
