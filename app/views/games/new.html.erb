@@ -1,0 +1,8 @@
+<p>Letters to play with: <%= @letters.join(', ') %></p>
+
+<form action="/score" method="post">
+  <input type="text" name="attempt">
+  <input type="submit" value="Submit a word">
+  <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+  <%= hidden_field_tag 'grid', @letters %>
+</form>
